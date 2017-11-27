@@ -1,0 +1,19 @@
+Users
+	handle : CHAR(25), user handle, primary key
+	first : CHAR(25), first name of user
+	last : CHAR(25), last name of user
+Posts
+  postId: INT, post's id, primary key
+  handle : CHAR(25), foreign key to Users
+  topic : ENUM('General', 'Classes', 'Professors', 'Athletics')
+  content : CHAR(160)
+  time : DATE, time and date of when it was posted
+Comments
+  commentId: INT, comment's id, primary key
+  postId: INT, foreign key to Posts
+  handle: CHAR(25) foreign key to Users
+  time: DATE, time and date of when it was commented
+Votes
+  postId: INT, foreign key to Posts
+  handle: CHAR(25), foreign key to Users
+  value: ENUM(-1,0,1)
