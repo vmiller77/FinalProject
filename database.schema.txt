@@ -7,7 +7,7 @@ Posts
   handle : CHAR(25), foreign key to Users
   topic : ENUM('General', 'Classes', 'Professors', 'Athletics')
   content : CHAR(160)
-  time : DATE, time and date of when it was posted
+  time : DATETIME, time and date of when it was posted
 Comments
   commentId: INT, comment's id, primary key
   postId: INT, foreign key to Posts
