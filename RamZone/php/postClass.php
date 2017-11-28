@@ -44,6 +44,14 @@ public static function create($user,$time,$content,$category,$title,$thumbnailLi
   return null;
 }
 
+public static function getAll(){
+  $mysqli = Post::connect();
+  $result = $mysqli->query("SELECT * FROM Posts");
+  if (!$result) {
+    print "Could not get the data!";
+  }
+}
+
 
 
 }

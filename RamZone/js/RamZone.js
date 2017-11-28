@@ -1,5 +1,17 @@
 $(document).ready(function() {
 
+//////////////////////////////////////////////////////////////////////////////////////
+/*Making a GET request to ajaxRequests.php to get all post data*/
+  var gotPosts=[];
+  var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
+  $.ajax(url_base + "/postScript.php",
+ {type: "GET",
+  dataType: "json",
+  success: function(todo_json, status, jqXHR) {
+ 	gotPosts=todo_json;
+     }
+ });
+///////////////////////////////////////////////////////////////////////////////////////////
     /* State variables for the utility panel and submit post form */
     var utilityPanelCollapsed = false;
     var submitPostExpanded = false;
@@ -174,7 +186,7 @@ $(document).ready(function() {
 
         // I added in this chunk to mess around with- may or may not work
         ////////////////////////////////////////////////////////////////////////
-	       var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php"
+	       var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
         /*  $.ajax(url_base + "/postScript.php",
           {type: "GET",
           dataType: "json",
