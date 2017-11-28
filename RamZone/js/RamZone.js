@@ -199,6 +199,8 @@ $(document).ready(function() {
                 $(".siteNavigationBar").animate({left: "+=215px"}, 200);
                 $(".content").animate({left: "+=215px"}, 200);
                 $(".utilityPanel__optionBlock").css("border-bottom", "1px solid #487697");
+                $(".loginBlock").animate({opacity: "1"}, 200);
+                $(".createAccountBlock").animate({opacity: "1"}, 200);
                 $(".utilityPanel__collapser__arrow").rotate({
                     angle: 180,
                     animateTo: 0,
@@ -212,6 +214,8 @@ $(document).ready(function() {
                 $(".siteNavigationBar").animate({left: "-=215px"}, 200);
                 $(".content").animate({left: "-=215px"}, 200);
                 $(".utilityPanel__optionBlock").css("border-bottom", "0px solid #487697");
+                $(".loginBlock").animate({opacity: "0"}, 200);
+                $(".createAccountBlock").animate({opacity: "0"}, 200);
                 $(".utilityPanel__collapser__arrow").rotate({
                     angle: 0,
                     animateTo: 180,
