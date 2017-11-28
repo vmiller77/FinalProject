@@ -20,7 +20,7 @@ public static function connect(){
 
 public static function create($user,$time,$content,$category,$title,$thumbnailLink) {
         $mysqli = Post::connect();
-  $query="INSERT INTO `Posts2` (`title`, `user`, `category`, `content`, `thumbnailLink`, `time`, `postId`) VALUES ('"
+  $query="INSERT INTO `Posts` (`title`, `user`, `category`, `content`, `thumbnailLink`, `time`, `postId`) VALUES ('"
     .$title.
     "', '"
     .$user.

@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
   exit();
   */
 } else if ($_SERVER['REQUEST_METHOD'] == "POST") {
-//******************** Should try to validate posts or make sur ebad ones cannot be submitted
+//******************** Should try to validate posts or make sure bad ones cannot be submitted
+
 //If it is of type newPost then Insert it!
   if (trim($_REQUEST['type'])=="newPost") {
       $title=trim($_REQUEST['title']);
