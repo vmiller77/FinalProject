@@ -112,6 +112,30 @@ $(document).ready(function() {
         $($post).insertBefore($(".prev"));
     }
 
+    /* This function clears up what content is being displayed */
+    var updateContentSortHeader = function() {
+        /* Update content header */
+        var sortPrefix = $(".utilityPanel__optionBlock__option__active").text().trim() == "Hot" ? "HOT posts in " :
+        $(".utilityPanel__optionBlock__option__active").text().trim() == "New" ? "NEW posts in " :
+        $(".utilityPanel__optionBlock__option__active").text().trim() == "Posts" ? "MY posts to " :
+        $(".utilityPanel__optionBlock__option__active").text().trim() == "Comments" ? "MY comments in " :
+        "My SAVED posts in ";
+        var categorySuffix = $(".siteNavigationBar__pageLink__active").text().toUpperCase();
+        if (categorySuffix == "ALL") {
+        if (sortPrefix == "MY posts to ") {
+        sortPrefix = "ALL of MY posts";
+        categorySuffix = "";
+        } else if (sortPrefix == "MY comments in ") {
+        sortPrefix = "ALL of MY comments";
+        categorySuffix = "";
+        } else if (sortPrefix == "My SAVED posts in ") {
+        sortPrefix = "ALL of my SAVED posts";
+        categorySuffix = "";
+        }
+        }
+        $(".content__header").html(sortPrefix + categorySuffix);
+    };
+
 
     /* ****************************** */
     /* ****** CLICK LISTENERS ******* */
@@ -194,6 +218,8 @@ $(document).ready(function() {
             $(".siteNavigationBar__pageLink").addClass("siteNavigationBar__pageLink__inactive");
             $(this).removeClass("siteNavigationBar__pageLink__inactive");
             $(this).addClass("siteNavigationBar__pageLink__active");
+
+            updateContentSortHeader();
         });
 
         /* Click listener for utility panel collapser */
@@ -204,6 +230,8 @@ $(document).ready(function() {
                 $(".siteNavigationBar").animate({left: "+=215px"}, 200);
                 $(".content").animate({left: "+=215px"}, 200);
                 $(".utilityPanel__optionBlock").css("border-bottom", "1px solid #487697");
+                $(".loginBlock").animate({opacity: "1"}, 200);
+                $(".createAccountBlock").animate({opacity: "1"}, 200);
                 $(".utilityPanel__collapser__arrow").rotate({
                     angle: 180,
                     animateTo: 0,
@@ -217,6 +245,8 @@ $(document).ready(function() {
                 $(".siteNavigationBar").animate({left: "-=215px"}, 200);
                 $(".content").animate({left: "-=215px"}, 200);
                 $(".utilityPanel__optionBlock").css("border-bottom", "0px solid #487697");
+                $(".loginBlock").animate({opacity: "0"}, 200);
+                $(".createAccountBlock").animate({opacity: "0"}, 200);
                 $(".utilityPanel__collapser__arrow").rotate({
                     angle: 0,
                     animateTo: 180,
@@ -260,6 +290,8 @@ $(document).ready(function() {
             } else {
                 $(".saved").attr("src", "./images/saved.png");
             }
+
+            updateContentSortHeader();
         });
 
     };

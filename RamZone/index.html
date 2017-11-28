@@ -42,7 +42,7 @@
         <div class="utilityPanel">
 
             <!-- Option Block for sorting -->
-            <div class="utilityPanel__optionBlock">
+            <div class="utilityPanel__optionBlock sortBlock">
                 <div class="utilityPanel__optionBlock__option utilityPanel__optionBlock__option__active">
                         <div class="utilityPanel__optionBlock__option__icon"><img class="icon hot" src="./images/hot.png"></div>
                         <p>Hot</p>
@@ -56,7 +56,7 @@
             </div>
 
             <!-- Option Block for viewing your own posts, comments, etc. -->
-            <div class="utilityPanel__optionBlock">
+            <div class="utilityPanel__optionBlock accountBlock">
                 <p class="utilityPanel__optionBlock__header">MY ACCOUNT</p>
                 <div class="utilityPanel__optionBlock__option utilityPanel__optionBlock__option__inactive">
                         <div class="utilityPanel__optionBlock__option__icon"><img class="icon posts" src="./images/posts.png"></div>
@@ -75,13 +75,35 @@
                 </div>
             </div>
 
-            <div class="utilityPanel__optionBlock">
+            <div class="utilityPanel__optionBlock logoutBlock">
                 <p class="utilityPanel__optionBlock__header">LOG OUT</p>
+            </div>
+
+            <!-- Login and account creation utility -->
+            <div class="utilityPanel__optionBlock loginBlock">
+                <!-- Login form -->
+                <p class="utilityPanel__optionBlock__header">LOGIN</p>
+                    <input class="utilityPanel__optionBlock__username utilityPanel__optionBlock__input" type="text" placeholder="username">
+                    <input class="utilityPanel__optionBlock__password utilityPanel__optionBlock__input" type="password" placeholder="password">
+                    <input class="utilityPanel__optionBlock__accountButton login" type="button" value="Login">
+            </div>
+
+            <div class="utilityPanel__optionBlock createAccountBlock">
+                <!-- Create account form -->
+                <p class="utilityPanel__optionBlock__header">CREATE AN ACCOUNT</p>
+                    <input class="utilityPanel__optionBlock__newUsername utilityPanel__optionBlock__input" type="text" placeholder="username">
+                    <input class="utilityPanel__optionBlock__email utilityPanel__optionBlock__input" type="text" placeholder="UNC email">
+                    <input class="utilityPanel__optionBlock__newPassword utilityPanel__optionBlock__input" type="password" placeholder="password">
+                    <input class="utilityPanel__optionBlock__confirmNewPassword utilityPanel__optionBlock__input" type="password" placeholder="confirm password">
+                    <input class="utilityPanel__optionBlock__accountButton signup" type="button" value="Create Account">
             </div>
         </div>
 
         <!-- Content (container for posts) -->
         <div class="content">
+
+            <!-- Description of the posts being displayed here -->
+            <p class="content__header">HOT posts in ALL</p>
 
             <!-- Example of a post. Note that these are now created dynamically from RamZone.js -->
             <!-- (eventually after pulling information from the database). -->
