@@ -1,17 +1,18 @@
 $(document).ready(function() {
 
-//////////////////////////////////////////////////////////////////////////////////////
-/*Making a GET request to ajaxRequests.php to get all post data*/
-  var gotPosts=[];
+/*GET request to ajaxRequests.php to get all post data and inserts into page*/
   var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
   $.ajax(url_base + "/postScript.php",
  {type: "GET",
   dataType: "json",
-  success: function(todo_json, status, jqXHR) {
- 	gotPosts=todo_json;
-     }
+  success: function(post_json, status, jqXHR) {
+    for(var i=0; i<post_json.length;i++){
+      var postTest = new Post(0, 0, post_json[i]['thumbnailLink'], post_json[i]['title'], post_json[i]['content'], Date.parse(post_json[i]['time']), post_json[i]['user'], post_json[i]['category'], 0);
+      insertPost(postTest);
+    }
+  }
  });
-///////////////////////////////////////////////////////////////////////////////////////////
+
     /* State variables for the utility panel and submit post form */
     var utilityPanelCollapsed = false;
     var submitPostExpanded = false;

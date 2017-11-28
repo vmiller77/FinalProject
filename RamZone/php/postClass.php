@@ -46,10 +46,15 @@ public static function create($user,$time,$content,$category,$title,$thumbnailLi
 
 public static function getAll(){
   $mysqli = Post::connect();
-  $result = $mysqli->query("SELECT * FROM Posts");
-  if (!$result) {
-    print "Could not get the data!";
-  }
+    $result = $mysqli->query("select * from Posts order by time desc");
+    $posts_array = array();
+
+    if ($result) {
+      while ($next_row = $result->fetch_array()) {
+	       $posts_array[] = $next_row;
+      }
+    }
+    return $posts_array;
 }
 
 
