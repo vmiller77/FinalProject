@@ -85,21 +85,21 @@ $(document).ready(function() {
                 $(this).siblings(".content__post__votes__arrow").addClass("content__post__votes__arrow__inactive");
                 $(this).removeClass("content__post__votes__arrow__inactive");
                 $(this).addClass("content__post__votes__arrow__active");
-    
+
                 var change = alreadyVoted ? 2 : 1;
-    
+
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) + change);
                 } else {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - change);
                 }
-                
-            } 
+
+            }
             /* Undo vote */
             else {
                 $(this).removeClass("content__post__votes__arrow__active");
                 $(this).addClass("content__post__votes__arrow__inactive");
-    
+
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - 1);
                 } else {
@@ -140,13 +140,44 @@ $(document).ready(function() {
         var title = $(".infoPane__submitForm__title").val();
         var content = $(".infoPane__submitForm__content").val();
         var user = "You";
-        var category = "General";
+        var category = $(".infoPane__submitForm_select").val();
         /* Insert the post into the DOM */
         var postObject = new Post(0, 0, thumbnailLink, title, content, Date.now(), user, category, 0);
         insertPost(postObject);
 
         /* TODO: Store the post object's data in our database */
         /* ... */
+
+        // I added in this chunk to mess around with- may or may not work
+        ////////////////////////////////////////////////////////////////////////
+	       var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php"
+        /*  $.ajax(url_base + "/postScript.php",
+          {type: "GET",
+          dataType: "json",
+          success: function(todo_json, status, jqXHR) {
+	           alert("SUCCESS!");
+            }
+          });
+          */
+          //create a json object to send
+          var send = {"type":"newPost","thumbnailLink":thumbnailLink,
+        "title":title,"content":content,"user":user,"category":category};
+          $.ajax(url_base + "/postScript.php",
+				      {type: "POST",
+					      dataType: "json",
+					      data: send,
+					      success: function(todo_json, status, jqXHR) {
+					      alert("SUCCESS");
+					  },
+					      error: function(jqXHR, status, error) {
+                alert("BAD");
+					      alert(jqXHR.responseText);
+					  }});
+
+
+        ///////////////////////////////////////////////////////////////////////
+
+
     });
 
 
@@ -156,7 +187,7 @@ $(document).ready(function() {
 
     /* DESKTOP */
     var prepareForDesktop = function() {
-        
+
         /* Click listener for categories */
         $(".siteNavigationBar__pageLink").click(function () {
             $(".siteNavigationBar__pageLink").removeClass("siteNavigationBar__pageLink__active");
@@ -164,7 +195,7 @@ $(document).ready(function() {
             $(this).removeClass("siteNavigationBar__pageLink__inactive");
             $(this).addClass("siteNavigationBar__pageLink__active");
         });
-    
+
         /* Click listener for utility panel collapser */
         $(".utilityPanel__collapser").click(function() {
             if (utilityPanelCollapsed) {
@@ -365,7 +396,7 @@ $(document).ready(function() {
                 $(".siteNavigationBar__pageLink__inactive").css("display", "inline-block");
                 navigationOpenedOnMobile = true;
             }
-            
+
         });
     };
 
