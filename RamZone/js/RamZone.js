@@ -1,17 +1,18 @@
 $(document).ready(function() {
 
-/*GET request to ajaxRequests.php to get all post data and inserts into page*/
-  var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
-  $.ajax(url_base + "/postScript.php",
- {type: "GET",
-  dataType: "json",
-  success: function(post_json, status, jqXHR) {
-    for(var i=0; i<post_json.length;i++){
-      var postTest = new Post(0, 0, post_json[i]['thumbnailLink'], post_json[i]['title'], post_json[i]['content'], Date.parse(post_json[i]['time']), post_json[i]['user'], post_json[i]['category'], 0);
-      insertPost(postTest);
-    }
-  }
- });
+    /*GET request to ajaxRequests.php to get all post data and inserts into page*/
+    var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
+    $.ajax(url_base + "/postScript.php",
+        {type: "GET",
+        dataType: "json",
+        success: function(post_json, status, jqXHR) {
+            for(var i=0; i<post_json.length;i++){
+                var postTest = new Post(0, 0, post_json[i]['thumbnailLink'], post_json[i]['title'], post_json[i]['content'], Date.parse(post_json[i]['time']), post_json[i]['user'], post_json[i]['category'], 0);
+                insertPost(postTest);
+            }
+        }
+        }
+    );
 
     /* State variables for the utility panel and submit post form */
     var utilityPanelCollapsed = false;
@@ -98,21 +99,21 @@ $(document).ready(function() {
                 $(this).siblings(".content__post__votes__arrow").addClass("content__post__votes__arrow__inactive");
                 $(this).removeClass("content__post__votes__arrow__inactive");
                 $(this).addClass("content__post__votes__arrow__active");
-
+    
                 var change = alreadyVoted ? 2 : 1;
-
+    
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) + change);
                 } else {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - change);
                 }
-
-            }
+                
+            } 
             /* Undo vote */
             else {
                 $(this).removeClass("content__post__votes__arrow__active");
                 $(this).addClass("content__post__votes__arrow__inactive");
-
+    
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - 1);
                 } else {
@@ -169,6 +170,7 @@ $(document).ready(function() {
     $(".infoPane__submitForm__postButton").click(function(event) {
         event.preventDefault();
 
+        /* If there is no title */
         if ($(".infoPane__submitForm__title").val().length < 1) {
             return;
         }
@@ -176,18 +178,35 @@ $(document).ready(function() {
         var thumbnailLink = $(".infoPane__submitForm__thumnailLink").val().substring(0,4) == "http" ? $(".infoPane__submitForm__thumnailLink").val() : "./images/logo.png";
         var title = $(".infoPane__submitForm__title").val();
         var content = $(".infoPane__submitForm__content").val();
-        var user = "You";
-        var category = $(".infoPane__submitForm_select").val();
-        /* Insert the post into the DOM */
-        var postObject = new Post(0, 0, thumbnailLink, title, content, Date.now(), user, category, 0);
+
+        /* Verify that the user is logged in */
+        var username = "";
+        $.ajax('./php/authenticate.php',
+            {type: 'POST',
+            cache: false,
+            success: function (data) {
+                /* User already logged in */
+                username = data["username"];
+            },
+            error: function () {
+                /* User not logged in */
+            }
+        });
+        if (username == "") {
+            return;
+        }
+
+        var category = $(".infoPane__submitForm__select").val();
+
+        /* Insert the post into the user's DOM */
+        var postObject = new Post(0, 0, thumbnailLink, title, content, Date.now(), username, category, 0);
         insertPost(postObject);
 
-        /* TODO: Store the post object's data in our database */
-        /* ... */
+        /* Store the post object's data in our database */
 
         // I added in this chunk to mess around with- may or may not work
         ////////////////////////////////////////////////////////////////////////
-	       var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
+        var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
         /*  $.ajax(url_base + "/postScript.php",
           {type: "GET",
           dataType: "json",
@@ -197,24 +216,22 @@ $(document).ready(function() {
           });
           */
           //create a json object to send
-          var send = {"type":"newPost","thumbnailLink":thumbnailLink,
-        "title":title,"content":content,"user":user,"category":category};
+          var send = {"type": "newPost","thumbnailLink": thumbnailLink, "title": title,"content": content,"user": username,"category": category};
           $.ajax(url_base + "/postScript.php",
-				      {type: "POST",
-					      dataType: "json",
-					      data: send,
-					      success: function(todo_json, status, jqXHR) {
-					      alert("SUCCESS");
-					  },
-					      error: function(jqXHR, status, error) {
-                alert("BAD");
-					      alert(jqXHR.responseText);
-					  }});
+				    {type: "POST",
+                        dataType: "json",
+                        data: send,
+                        success: function(todo_json, status, jqXHR) {
+                        // alert("SUCCESS");
+					    },
+					    error: function(jqXHR, status, error) {
+                        // alert("BAD");
+					    // alert(jqXHR.responseText);
+                        }
+                    });
 
 
         ///////////////////////////////////////////////////////////////////////
-
-
     });
 
 
@@ -224,7 +241,7 @@ $(document).ready(function() {
 
     /* DESKTOP */
     var prepareForDesktop = function() {
-
+        
         /* Click listener for categories */
         $(".siteNavigationBar__pageLink").click(function () {
             $(".siteNavigationBar__pageLink").removeClass("siteNavigationBar__pageLink__active");
@@ -234,7 +251,7 @@ $(document).ready(function() {
 
             updateContentSortHeader();
         });
-
+    
         /* Click listener for utility panel collapser */
         $(".utilityPanel__collapser").click(function() {
             if (utilityPanelCollapsed) {
@@ -307,6 +324,133 @@ $(document).ready(function() {
             updateContentSortHeader();
         });
 
+        /* If the user is already logged in */
+        $.ajax('./php/authenticate.php',
+            {type: 'POST',
+            cache: false,
+            success: function (data) {
+                /* User already logged in, so display account and logout blocks */
+                $(".accountBlock").css("display", "block");
+                $(".logoutBlock").css("display", "block");
+                $(".loginBlock").css("display", "none");
+                $(".createAccountBlock").css("display", "none");
+
+                $(".usernameHeader").html("" + data["username"].toUpperCase());
+            },
+            error: function () {
+                /* User not logged in, so display login and register blocks */
+                $(".accountBlock").css("display", "none");
+                $(".logoutBlock").css("display", "none");
+                $(".loginBlock").css("display", "block");
+                $(".createAccountBlock").css("display", "block");
+            }
+        });
+
+        /* Logout */
+        $(".logout").click(function(e) {
+            e.preventDefault();
+            $.ajax('./php/process-logout.php', 
+                {type: 'POST',
+                cache: false,
+                success: function () {
+                    $(".accountBlock").css("display", "none");
+                    $(".logoutBlock").css("display", "none");
+                    $(".loginBlock").css("display", "block");
+                    $(".createAccountBlock").css("display", "block");
+                    $(".usernameHeader").html("MY ACCOUNT");
+                },
+                error: function () {
+                    $(".accountBlock").css("display", "block");
+                    $(".logoutBlock").css("display", "block");
+                    $(".loginBlock").css("display", "none");
+                    $(".createAccountBlock").css("display", "none");
+                }
+            });
+        });
+
+        /* Login */
+        $(".login").click(function(e) {
+            e.preventDefault();
+            $.ajax('./php/process-login.php', 
+                {type: 'POST',
+                data: {username: $('.utilityPanel__optionBlock__username').val(), password: hex_sha512($('.utilityPanel__optionBlock__password').val())},
+                cache: false,
+                success: function (data) {
+                    $(".accountBlock").css("display", "block");
+                    $(".logoutBlock").css("display", "block");
+                    $(".loginBlock").css("display", "none");
+                    $(".createAccountBlock").css("display", "none");
+
+                    var normalColor = "#0b4779";
+                    $(".accountBlock").css("background-color", "#548436");
+                    $(".accountBlock").animate({backgroundColor: normalColor}, 1000);
+
+                    $('.utilityPanel__optionBlock__username').val("");
+                    $('.utilityPanel__optionBlock__password').val("");
+
+                    $(".usernameHeader").html("" + data["username"].toUpperCase());
+                },
+                error: function () {
+                    $(".accountBlock").css("display", "none");
+                    $(".logoutBlock").css("display", "none");
+                    $(".loginBlock").css("display", "block");
+                    $(".createAccountBlock").css("display", "block");
+
+                    var normalColor = "#0b4779";
+                    $(".loginBlock").css("background-color", "#a0442b");
+                    $(".loginBlock").animate({backgroundColor: normalColor}, 1000);
+                }
+            });
+        });
+
+        /* Register a New User */
+        $(".signup").click(function(e) {
+            e.preventDefault();
+
+            /* Check to see if username contains spaces */
+            reg = /^\w+$/; 
+            if(!reg.test($(".utilityPanel__optionBlock__newUsername").val())) { 
+                $(".utilityPanel__optionBlock__newUsername").focus();
+                return false;
+            }
+
+            /* Check to make sure passwords match */
+            if ($('.utilityPanel__optionBlock__newPassword').val() != $('.utilityPanel__optionBlock__confirmNewPassword').val()) {
+                $('.utilityPanel__optionBlock__confirmNewPassword').focus();
+                return false;
+            }
+
+            $.ajax('./php/process-register.php',
+                {type: 'POST',
+                data: {username: $('.utilityPanel__optionBlock__newUsername').val(), email: $('.utilityPanel__optionBlock__email').val(), password: hex_sha512($('.utilityPanel__optionBlock__newPassword').val())},
+                cache: false,
+                success: function () {
+                    $(".accountBlock").css("display", "block");
+                    $(".logoutBlock").css("display", "block");
+                    $(".loginBlock").css("display", "none");
+                    $(".createAccountBlock").css("display", "none");
+
+                    $('.utilityPanel__optionBlock__newUsername').val("");
+                    $('.utilityPanel__optionBlock__email').val("");
+                    $('.utilityPanel__optionBlock__newPassword').val("");
+                    $('.utilityPanel__optionBlock__confirmNewPassword').val("");
+
+                    var normalColor = "#0b4779";
+                    $(".loginBlock").css("background-color", "#548436");
+                    $(".loginBlock").animate({backgroundColor: normalColor}, 1000);
+                },
+                error: function () {
+                    $(".accountBlock").css("display", "none");
+                    $(".logoutBlock").css("display", "none");
+                    $(".loginBlock").css("display", "block");
+                    $(".createAccountBlock").css("display", "block");
+
+                    var normalColor = "#0b4779";
+                    $(".createAccountBlock").css("background-color", "#a0442b");
+                    $(".createAccountBlock").animate({backgroundColor: normalColor}, 1000);
+                }
+            });
+        });
     };
 
     /* MOBILE ( NOT HIGHLY IMPORTANT RIGHT NOW!! ) */
@@ -441,7 +585,7 @@ $(document).ready(function() {
                 $(".siteNavigationBar__pageLink__inactive").css("display", "inline-block");
                 navigationOpenedOnMobile = true;
             }
-
+            
         });
     };
 
