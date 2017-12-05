@@ -10,10 +10,12 @@
 
         <!-- Stylesheet -->
         <link href="styles.css" rel="stylesheet" type="text/css">
-
+        
         <!-- JS Sources -->
         <script src="./js/jquery-3.2.1.js"></script>
         <script src="./js/jquery-rotation.js"></script>
+        <script src="./js/jquery-ui.min.js"></script>
+        <script src="./js/sha-512.js"></script>
         <script src="./js/RamZone.js"></script>
     </head>
 
@@ -57,7 +59,7 @@
 
             <!-- Option Block for viewing your own posts, comments, etc. -->
             <div class="utilityPanel__optionBlock accountBlock">
-                <p class="utilityPanel__optionBlock__header">MY ACCOUNT</p>
+                <p class="utilityPanel__optionBlock__header usernameHeader">MY ACCOUNT</p>
                 <div class="utilityPanel__optionBlock__option utilityPanel__optionBlock__option__inactive">
                         <div class="utilityPanel__optionBlock__option__icon"><img class="icon posts" src="./images/posts.png"></div>
                         <p>Posts</p>
@@ -76,7 +78,7 @@
             </div>
 
             <div class="utilityPanel__optionBlock logoutBlock">
-                <p class="utilityPanel__optionBlock__header">LOG OUT</p>
+                <input class="utilityPanel__optionBlock__accountButton logout" type="button" value="Logout">
             </div>
 
             <!-- Login and account creation utility -->
@@ -144,11 +146,11 @@
                 <input class="infoPane__submitForm__title infoPane__submitForm__input" type="text" placeholder="Title of your post">
                 <textarea class="infoPane__submitForm__content infoPane__submitForm__input" placeholder="Content of your post (optional)"></textarea>
                 <input class="infoPane__submitForm__thumnailLink infoPane__submitForm__input" type="text" placeholder="image link (optional)">
-                <select class="infoPane__submitForm_select">
-                  <option value="General">General</option>
-                  <option value="Classes">Classes</option>
-                  <option value="Athletics">Athletics</option>
-                  <option value="Professors">Professors</option>
+                <select class="infoPane__submitForm__select">
+                    <option value="General">General</option>
+                    <option value="Classes">Classes</option>
+                    <option value="Athletics">Athletics</option>
+                    <option value="Professors">Professors</option>
                 </select>
                 <input class="infoPane__submitForm__postButton" type="button" value="Post">
             </div>
