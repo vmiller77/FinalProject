@@ -11,10 +11,11 @@ $(document).ready(function() {
 
 
 
-          
+
         }
       }
     };
+
 
 
     /* State variables for the utility panel, submit post form, and content posts */
@@ -117,7 +118,7 @@ $(document).ready(function() {
         var $comment = $(
             "<div class='content__post__comments__comment'>"+
                 "<p class='content__post__comments__comment__text'>" + comment.getContent() + "</p>"+
-                "<p class='content__post__comments__comment__user'>user" + comment.getUID() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
+                "<p class='content__post__comments__comment__user'>user" + comment.getUser() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
             "</div>"
         );
         // $comment.prop("associatedCommentObject", comment);
