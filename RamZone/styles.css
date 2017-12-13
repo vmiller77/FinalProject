@@ -9,7 +9,7 @@ body {
 	text-align: center;
 	
 	/* Color */
-	background-color: #b8ddff;
+	background-color: #d7edff;
 }
 
 .siteNavigationBar {
@@ -135,7 +135,8 @@ body {
     /* Size */
 	width: 250px;
     height: 100%;
-    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: hidden;
     
     /* Position and Display */
     position: fixed;
@@ -312,7 +313,7 @@ body {
             cursor: pointer;
 
             /* Color */
-            background-color: #155f97;
+            background-color: #1c7ec065;
         }
 
         .utilityPanel__optionBlock__option__text {
@@ -446,8 +447,10 @@ body {
     }
     .content__post {
         /* Size */
-        width: 60%;
+        width: 62%;
         height: 90px;
+        overflow-y: hidden;
+        overflow-x: hidden;
         
         /* Position and Display */
         display: table;
@@ -455,7 +458,7 @@ body {
         z-index: 81;
 
         /* Border and Padding */
-        padding: 10px;
+        padding: 10px 10px 16px 10px;
         /* border: 1px solid #488cc0; */
 
         /* Color */
@@ -464,7 +467,7 @@ body {
     .content__post:hover {
         /* Color */
         /* background-color: #b8ddff; */
-        background-color: #b0d6f8;
+        background-color: #cbe8fa;
     }
         .content__post__votes {
             /* Size */
@@ -592,6 +595,22 @@ body {
                 /* Cursor */
                 cursor: pointer;
             }
+            .content__post__textContent__content {
+                /* Text */
+                text-align: left;
+                font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+
+                /* Border and Padding */
+                padding-left: 10px;
+
+                /* Color */
+                color: #566977;
+
+                /* Display */
+                display: none;
+            }
             .content__post__textContent__details {
                 /* Text */
                 text-align: left;
@@ -626,6 +645,137 @@ body {
                     text-decoration: underline;
                     cursor: pointer;
                 }
+        
+        .content__post__commentForm {
+            /* Size */
+            width: 80%;
+            height: auto;
+    
+            /* Position and Display */
+            display: none;
+            text-align: left;
+            z-index: 90;
+            margin-left: 50px;
+            display: none;
+    
+            /* Border and Padding */
+            /* padding: 15px 10px 10px 10px; */
+            /* border-left: 3px solid #0e66ad; */
+            border-bottom: 1px dashed rgb(73, 100, 122);
+    
+            /* Color */
+            /* background-color: #127cd3; */
+            /* background-color: #96cbfa; */
+        }
+            .content__post__commentForm__input {
+                /* Size */
+                width: 90%;
+                
+                /* Display and Position */
+                display: block;
+                margin-top: 15px;
+                margin-bottom: 15px;
+    
+                /* Border and Padding */
+                padding: 5px 10px;
+                border: 1px solid #306481;
+                border-radius: 0px;
+                
+                /* Text */
+                font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                color: #1e486b;
+                text-overflow: auto;
+                font-size: 14px;
+                font-weight: 400;
+    
+                /* Color */
+                background-color: #18558111;
+            }
+                .content__post__commentForm__input::-webkit-input-placeholder {
+                    color: #386e9b;
+                }
+                .content__post__commentForm__input::-moz-placeholder {
+                    color: #386e9b;
+                }
+            .content__post__commentForm__content {
+                height: 100px;
+            }
+
+            .content__post__commentForm__commentButton {
+                display: block;
+                background-color: #127cd3;
+                border: none;
+                border-bottom: 3px solid #306481;
+                border-radius: 0px;
+                width: 20%;
+                font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                color: #ffffff;
+                font-size: 15px;
+                padding: 5px 8px;
+                text-decoration: none;
+                margin-bottom: 15px;
+            }    
+                .content__post__commentForm__commentButton:hover {
+                    background-color: #2389d6;
+                    cursor: pointer;
+                }
+
+        .content__post__comments {
+            /* Size */
+            width: 600px;
+            height: 70px;
+            
+            /* Position and Display */
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            position: relative;
+            display: none;
+            z-index: 81;
+
+            /* Border and Padding */
+            padding: 0px 8px 18px 8px;
+            margin-left: 50px;
+            margin-top: 10px;
+        }
+            .content__post__comments__comment {
+                /* Text */
+                text-align: left;
+                font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                word-wrap: wrap;
+
+                /* Border and Padding */
+                padding-left: 10px;
+                padding-top: 2px;
+                padding-bottom: 2px;
+                border-left: 2px solid #3c7592;
+
+                /* Display */
+                margin-bottom: 15px;
+            }
+            .content__post__comments__comment:hover {
+                border-left: 3px solid #244f64;
+                padding-left: 9px;
+            }
+                .content__post__comments__comment__text {
+                    /* Color */
+                    color: #566977;
+
+                    /* Font */
+                    font-size: 14px;
+                    font-weight: 300;
+                }
+                .content__post__comments__comment__user {
+                    /* Color */
+                    color: #32373b;
+
+                    /* Font */
+                    font-size: 10px;
+                    font-weight: 200;
+
+                    /* Border and Padding */
+                    padding-left: 15px;
+                }
 
     .content__navigator {
         /* Text */
@@ -648,14 +798,14 @@ body {
 
         .next {
             float: right;
-            padding-right: 40%;
+            padding-right: 42%;
         }
 
 .infoPane {
     /* Size */
     width: 25%;
-    height: 100%;
-    overflow-y: hidden;
+    height: 95%;
+    overflow-y: auto;
     overflow-x: hidden;
 
     /* Position and Display */
@@ -673,7 +823,7 @@ body {
 
     /* Color */
     /* background-color: #127cd3; */
-    background-color: #b8ddff;
+    background-color: #d7edff;
 }
     .infoPane__submitButton {
         display: block;
@@ -754,6 +904,47 @@ body {
         .infoPane__submitForm__thumbnailLink {
             
         }
+
+        .infoPane__submitForm__select {
+            /* Size */
+            width: 80%;
+            
+            /* Display and Position */
+            display: block;
+            margin: 15px auto auto auto;
+
+            /* Border and Padding */
+            padding: 5px 10px;
+            border: 1px solid #306481;
+            border-radius: 0px;
+            
+            /* Text */
+            font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: #1e486b;
+            text-overflow: auto;
+            font-size: 14px;
+            font-weight: 400;
+
+            /* Color */
+            background: rgb(183, 223, 253);
+            color: rgb(80, 123, 160);
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }    
+            .infoPane__submitForm__select::-ms-expand {
+                display: none;
+            }
+            .infoPane__submitForm__select:hover,
+            .infoPane__submitForm__select:focus {
+                color: #386e9b;
+                background-color: #18548136;
+                cursor: pointer;
+            }
+            .infoPane__submitForm__select:disabled {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
         .infoPane__submitForm__postButton {
             display: block;
             background-color: #127cd3;
