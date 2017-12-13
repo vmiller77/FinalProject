@@ -4,14 +4,16 @@ $(document).ready(function() {
     var search=function(searchString){
       var searchWords=searchString.split(' ');
       post=$(".content__post__textContent")
+
+      //goes through each post
       for(var i = 0; i < post.length;i++){
         children=post.children;
-        if(children[0].innerText||children[1].innerText){
 
-
-
-
-          
+        //goes through each word in search bar
+        for(var i=0; i <searchWords.length;i++){
+          if(children[0].innerText.include(searchWords[i])||children[1].innerText.include(searchWords[i])){
+            console.log()
+          }
         }
       }
     };
