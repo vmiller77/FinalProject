@@ -3,13 +3,18 @@ $(document).ready(function() {
     /*Search Bar Function*/
     var search=function(searchString){
       var searchWords=searchString.split(' ');
-      post=$(".content__post__textContent");
+      //all posts
+      post=$(".content__post")
 
       //goes through each post
       for(var i = 0; i < post.length;i++){
-        children=post.children;
+        post_i=post[i];
+        children=post_i.children;
+        //goes through each word in search Bar
+        for(var i = 0; i < searchWords.length;i++){
+          if(children[0].innerText.includes(searchWords)||children[1].innerText.includes(searchWords)){
 
-
+          }
         }
     };
 
