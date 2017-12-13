@@ -4,12 +4,10 @@ $(document).ready(function() {
     var search=function(searchString){
       var searchWords=searchString.split(' ');
       post=$(".content__post__textContent")
+
+      //goes through each post
       for(var i = 0; i < post.length;i++){
         children=post.children;
-        if(children[0].innerText||children[1].innerText){
-
-
-
 
 
         }
