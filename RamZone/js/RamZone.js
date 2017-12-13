@@ -1,5 +1,22 @@
 $(document).ready(function() {
 
+    /*Search Bar Function*/
+    var search=function(searchString){
+      var searchWords=searchString.split(' ');
+      post=$(".content__post__textContent")
+      for(var i = 0; i < post.length;i++){
+        children=post.children;
+        if(children[0].innerText||children[1].innerText){
+
+
+
+
+          
+        }
+      }
+    };
+
+
     /* State variables for the utility panel, submit post form, and content posts */
     var utilityPanelCollapsed = false;
     var submitPostExpanded = false;
@@ -26,7 +43,7 @@ $(document).ready(function() {
         this.getTimeSinceSubmitted = function() {
             /* Gets minutes (as an integer) since post was submitted */
             var minuteDifference = parseInt( (Date.now() - timeSubmitted) / 1000.0 / 60.0 );
-            
+
             /* If it's been more than an hours */
             if (minuteDifference > 60) {
                 if (minuteDifference / 60 < 2) {
@@ -221,17 +238,17 @@ $(document).ready(function() {
         /* Enable upvote and downvote arrows for the post */
         $post.find(".content__post__votes__arrow").click(function() {
 
-            
+
             /* Verify that the user is logged in */
             $.ajax('./php/authenticate.php',
                 {type: 'POST',
                 cache: false,
                 success: function (data) {
                     /* User already logged in */
-                    
+
                 },
                 error: function () {
-                    
+
                 }
             });
 
@@ -244,9 +261,9 @@ $(document).ready(function() {
                 $(this).siblings(".content__post__votes__arrow").addClass("content__post__votes__arrow__inactive");
                 $(this).removeClass("content__post__votes__arrow__inactive");
                 $(this).addClass("content__post__votes__arrow__active");
-    
+
                 change = alreadyVoted ? 2 : 1;
-    
+
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) + change);
                     currentVote = 1;
@@ -255,13 +272,13 @@ $(document).ready(function() {
                     change = change * -1;
                     currentVote = -1;
                 }
-                
-            } 
+
+            }
             /* Undo vote */
             else {
                 $(this).removeClass("content__post__votes__arrow__active");
                 $(this).addClass("content__post__votes__arrow__inactive");
-    
+
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - 1);
                     change = -1;
@@ -288,7 +305,7 @@ $(document).ready(function() {
                 }
             });
 
-            
+
         });
 
         /* Function for displaying a post */
@@ -473,7 +490,7 @@ $(document).ready(function() {
 
             updateContentSortHeader();
         });
-    
+
         /* Click listener for utility panel collapser */
         $(".utilityPanel__collapser").click(function() {
             if (utilityPanelCollapsed) {
@@ -575,7 +592,7 @@ $(document).ready(function() {
         /* Logout */
         $(".logout").click(function(e) {
             e.preventDefault();
-            $.ajax('./php/process-logout.php', 
+            $.ajax('./php/process-logout.php',
                 {type: 'POST',
                 cache: false,
                 success: function () {
@@ -597,7 +614,7 @@ $(document).ready(function() {
         /* Login */
         $(".login").click(function(e) {
             e.preventDefault();
-            $.ajax('./php/process-login.php', 
+            $.ajax('./php/process-login.php',
                 {type: 'POST',
                 data: {username: $('.utilityPanel__optionBlock__username').val(), password: hex_sha512($('.utilityPanel__optionBlock__password').val())},
                 cache: false,
@@ -634,8 +651,8 @@ $(document).ready(function() {
             e.preventDefault();
 
             /* Check to see if username contains spaces */
-            reg = /^\w+$/; 
-            if(!reg.test($(".utilityPanel__optionBlock__newUsername").val())) { 
+            reg = /^\w+$/;
+            if(!reg.test($(".utilityPanel__optionBlock__newUsername").val())) {
                 $(".utilityPanel__optionBlock__newUsername").focus();
                 var normalColor = "#0b4779";
                 $(".createAccountBlock").css("background-color", "#a0442b");
@@ -734,7 +751,7 @@ $(document).ready(function() {
             }
         });
 
-        
+
     };
 
     prepareForDesktop();

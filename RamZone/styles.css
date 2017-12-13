@@ -4,10 +4,10 @@ body {
 	/* Size */
 	width: 100%;
     height: 100%;
-	
+
 	/* Position and Display */
 	text-align: center;
-	
+
 	/* Color */
 	background-color: #d7edff;
 }
@@ -16,7 +16,7 @@ body {
     /* Size */
 	width: 100%;
     height: 35px;
-    
+
     /* Position and Display */
     position: fixed;
     text-align: left;
@@ -46,7 +46,7 @@ body {
             padding: 5px 10px;
             border: 1px solid #306481;
             border-radius: 0px;
-            
+
             /* Text */
             font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: #ffffff;
@@ -61,7 +61,7 @@ body {
             .siteNavigationBar__search::-moz-placeholder {
                 color: #a4c6e2;
             }
-        
+
         .siteNavigationBar__searchButton {
             display: inline-block;
             background-color: #80b9e236;
@@ -74,7 +74,7 @@ body {
             padding: 5px 8px;
             margin-left: -4px;
             text-decoration: none;
-        }    
+        }
             .siteNavigationBar__searchButton:hover {
                 background-color: #9ec5e04d;
                 cursor: pointer;
@@ -84,7 +84,7 @@ body {
             /* Size */
             width: 100px;
             height: 100%;
-            
+
             /* Position and Display */
             display: inline-block;
             position: relative;
@@ -137,7 +137,7 @@ body {
     height: 100%;
     overflow-y: hidden;
     overflow-x: hidden;
-    
+
     /* Position and Display */
     position: fixed;
     text-align: left;
@@ -155,7 +155,7 @@ body {
             /* Size */
             width: 250px;
             height: 35px;
-            
+
             /* Position and Display */
             position: fixed;
             display: table;
@@ -234,7 +234,7 @@ body {
             width: 250px;
             height: auto;
             overflow: hidden;
-            
+
             /* Position and Display */
             display: block;
             text-align: left;
@@ -308,7 +308,7 @@ body {
             /* Border and Padding */
             /* border-left: 2px solid #74c77b;
             padding-left: 18px; */
-            
+
             /* Cursor */
             cursor: pointer;
 
@@ -405,7 +405,7 @@ body {
                 background-color: #197cc4;
                 cursor: pointer;
             }
-        
+
         .logoutBlock {
             /* Display */
             display: none;
@@ -417,7 +417,7 @@ body {
     height: 93%;
     overflow-y: scroll;
     overflow-x: hidden;
-    
+
     /* Position and Display */
     position: fixed;
     display: inline-block;
@@ -451,7 +451,7 @@ body {
         height: 90px;
         overflow-y: hidden;
         overflow-x: hidden;
-        
+
         /* Position and Display */
         display: table;
         text-align: left;
@@ -473,7 +473,7 @@ body {
             /* Size */
             width: 20px;
             height: 70px;
-            
+
             /* Position and Display */
             display: table-cell;
             vertical-align: middle;
@@ -491,7 +491,7 @@ body {
                 /* Size */
                 width: 20px;
                 height: 15px;
-                
+
                 /* Position and Display */
                 display: block;
                 z-index: 81;
@@ -533,7 +533,7 @@ body {
             /* Size */
             width: 70px;
             height: 70px;
-            
+
             /* Position and Display */
             display: table-cell;
             vertical-align: middle;
@@ -562,7 +562,7 @@ body {
             /* Size */
             width: 600px;
             height: 70px;
-            
+
             /* Position and Display */
             display: table-cell;
             vertical-align: middle;
@@ -645,24 +645,24 @@ body {
                     text-decoration: underline;
                     cursor: pointer;
                 }
-        
+
         .content__post__commentForm {
             /* Size */
             width: 80%;
             height: auto;
-    
+
             /* Position and Display */
             display: none;
             text-align: left;
             z-index: 90;
             margin-left: 50px;
             display: none;
-    
+
             /* Border and Padding */
             /* padding: 15px 10px 10px 10px; */
             /* border-left: 3px solid #0e66ad; */
             border-bottom: 1px dashed rgb(73, 100, 122);
-    
+
             /* Color */
             /* background-color: #127cd3; */
             /* background-color: #96cbfa; */
@@ -670,24 +670,24 @@ body {
             .content__post__commentForm__input {
                 /* Size */
                 width: 90%;
-                
+
                 /* Display and Position */
                 display: block;
                 margin-top: 15px;
                 margin-bottom: 15px;
-    
+
                 /* Border and Padding */
                 padding: 5px 10px;
                 border: 1px solid #306481;
                 border-radius: 0px;
-                
+
                 /* Text */
                 font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                 color: #1e486b;
                 text-overflow: auto;
                 font-size: 14px;
                 font-weight: 400;
-    
+
                 /* Color */
                 background-color: #18558111;
             }
@@ -714,7 +714,7 @@ body {
                 padding: 5px 8px;
                 text-decoration: none;
                 margin-bottom: 15px;
-            }    
+            }
                 .content__post__commentForm__commentButton:hover {
                     background-color: #2389d6;
                     cursor: pointer;
@@ -724,7 +724,7 @@ body {
             /* Size */
             width: 600px;
             height: 70px;
-            
+
             /* Position and Display */
             display: table-cell;
             vertical-align: middle;
@@ -838,12 +838,12 @@ body {
         padding: 5px 8px;
         margin: auto;
         text-decoration: none;
-    }    
+    }
         .infoPane__submitButton:hover {
             background-color: #2389d6;
             cursor: pointer;
         }
-    
+
     .infoPane__submitForm {
         /* Size */
         width: 80%;
@@ -868,7 +868,7 @@ body {
         .infoPane__submitForm__input {
             /* Size */
             width: 80%;
-            
+
             /* Display and Position */
             display: block;
             margin: 15px auto auto auto;
@@ -877,7 +877,7 @@ body {
             padding: 5px 10px;
             border: 1px solid #306481;
             border-radius: 0px;
-            
+
             /* Text */
             font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: #1e486b;
@@ -902,13 +902,13 @@ body {
             height: 100px;
         }
         .infoPane__submitForm__thumbnailLink {
-            
+
         }
 
         .infoPane__submitForm__select {
             /* Size */
             width: 80%;
-            
+
             /* Display and Position */
             display: block;
             margin: 15px auto auto auto;
@@ -917,7 +917,7 @@ body {
             padding: 5px 10px;
             border: 1px solid #306481;
             border-radius: 0px;
-            
+
             /* Text */
             font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             color: #1e486b;
@@ -930,7 +930,7 @@ body {
             color: rgb(80, 123, 160);
             -webkit-appearance: none;
             -moz-appearance: none;
-        }    
+        }
             .infoPane__submitForm__select::-ms-expand {
                 display: none;
             }
@@ -968,7 +968,7 @@ body {
         /* Size */
         width: 80%;
         height: auto;
-        
+
         /* Position and Display */
         display: block;
         text-align: center;
@@ -1010,7 +1010,7 @@ body {
                 /* Size */
                 width: 100%;
                 height: auto;
-                
+
                 /* Position and Display */
                 margin: auto;
                 z-index: 81;
@@ -1043,3 +1043,6 @@ body {
                 /* Color */
                 color: #275e88;
             }
+						#kmplink {
+							text-align: center;
+						}
