@@ -3,7 +3,7 @@ $(document).ready(function() {
     /*Search Bar Function*/
     var search=function(searchString){
       var searchWords=searchString.split(' ');
-      post=$(".content__post__textContent")
+      post=$(".content__post__textContent");
 
       //goes through each post
       for(var i = 0; i < post.length;i++){
@@ -11,7 +11,6 @@ $(document).ready(function() {
 
 
         }
-      }
     };
 
 
