@@ -118,9 +118,11 @@ $(document).ready(function() {
         var $comment = $(
             "<div class='content__post__comments__comment'>"+
                 "<p class='content__post__comments__comment__text'>" + comment.getContent() + "</p>"+
-                "<p class='content__post__comments__comment__user'>user" + comment.getUser() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
+                "<p class='content__post__comments__comment__user'>user" + comment.getUID() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
             "</div>"
         );
+        console.log(comment.getUser());
+        
         // $comment.prop("associatedCommentObject", comment);
         $post.find(".content__post__comments").append($comment);
         posts[postID]["object"].getComments().push(comment);
