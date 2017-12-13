@@ -24,7 +24,7 @@ if (isset($_SESSION['user_id'], $_SESSION['username'], $_COOKIE['auth'])) {
             $auth_check = hash('sha512', $password . $user_browser);
             if ($auth_check == $auth) {
                 header('Content-type: application/json');
-                $json_obj = array('username' => $username);
+                $json_obj = array('username' => $username, 'uid' => $user_id);
                 print(json_encode($json_obj));
             } else {
                 header('HTTP/1.1 401 Unauthorized');
