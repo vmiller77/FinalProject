@@ -1,33 +1,61 @@
 $(document).ready(function() {
 
-    /*GET request to ajaxRequests.php to get all post data and inserts into page*/
-    var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
-    $.ajax(url_base + "/postScript.php",
-        {type: "GET",
-        dataType: "json",
-        success: function(post_json, status, jqXHR) {
-            for(var i=0; i<post_json.length;i++){
-                var postTest = new Post(0, 0, post_json[i]['thumbnailLink'], post_json[i]['title'], post_json[i]['content'], Date.parse(post_json[i]['time']), post_json[i]['user'], post_json[i]['category'], 0);
-                insertPost(postTest);
-            }
-        }
-        }
-    );
-
-    /* State variables for the utility panel and submit post form */
+    /* State variables for the utility panel, submit post form, and content posts */
     var utilityPanelCollapsed = false;
     var submitPostExpanded = false;
+    var postActive = false;
+    var $activePostObject = null;
 
     /* Not necessary until mobile optimization is complete */
     var navigationOpenedOnMobile = false;
 
-    /* Class representing a post */
-    var Post = function(upvotes, downvotes, image, title, content, timeSubmitted, user, category, numberOfComments) {
-        this.getUpvotes = function() {
-            return upvotes;
+    /* Local collection of posts */
+    var posts = [];
+
+    /* Class representing a comment */
+    var Comment = function(id, pid, content, timeSubmitted, username, uid) {
+        this.getID = function() {
+            return id;
         }
-        this.getDownvotes = function() {
-            return downvotes;
+        this.getPID = function() {
+            return pid;
+        }
+        this.getContent = function() {
+            return content;
+        }
+        this.getTimeSinceSubmitted = function() {
+            /* Gets minutes (as an integer) since post was submitted */
+            var minuteDifference = parseInt( (Date.now() - timeSubmitted) / 1000.0 / 60.0 );
+            
+            /* If it's been more than an hours */
+            if (minuteDifference > 60) {
+                if (minuteDifference / 60 < 2) {
+                    return "1 hour";
+                } if (minuteDifference / 60 < 24) {
+                    parseInt(minuteDifference / 60) + " hours";
+                } if (minuteDifference / 60 / 24 < 2) {
+                    return "1 day";
+                }
+                return parseInt(minuteDifference / 60 / 24) + " days";
+            } else {
+                return minuteDifference + " minutes";
+            }
+        }
+        this.getUser = function() {
+            return username;
+        }
+        this.getUID = function() {
+            return uid;
+        }
+    }
+
+    /* Class representing a post */
+    var Post = function(id, voteCount, image, title, content, timeSubmitted, user, category, comments) {
+        this.getID = function() {
+            return id;
+        }
+        this.getVoteCount = function() {
+            return voteCount;
         }
         this.getImage = function() {
             return image;
@@ -44,10 +72,14 @@ $(document).ready(function() {
 
             /* If it's been more than an hours */
             if (minuteDifference > 60) {
-                if (minuteDifference % 60 < 2) {
+                if (minuteDifference / 60 < 2) {
                     return "1 hour";
+                } if (minuteDifference / 60 < 24) {
+                    parseInt(minuteDifference / 60) + " hours";
+                } if (minuteDifference / 60 / 24 < 2) {
+                    return "1 day";
                 }
-                return (minuteDifference % 60) + " hours";
+                return parseInt(minuteDifference / 60 / 24) + " days";
             } else {
                 return minuteDifference + " minutes";
             }
@@ -58,20 +90,41 @@ $(document).ready(function() {
         this.getCategory = function() {
             return category;
         }
-        this.getNumberOfComments = function() {
-            return numberOfComments;
+        this.getComments = function() {
+            return comments;
         }
     }
 
+    /* Function that inserts a comment into the active post */
+    var insertComment = function(comment, $post, postID) {
+        var $comment = $(
+            "<div class='content__post__comments__comment'>"+
+                "<p class='content__post__comments__comment__text'>" + comment.getContent() + "</p>"+
+                "<p class='content__post__comments__comment__user'>user" + comment.getUID() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
+            "</div>"
+        );
+        // $comment.prop("associatedCommentObject", comment);
+        $post.find(".content__post__comments").append($comment);
+        posts[postID]["object"].getComments().push(comment);
+    };
+
     /* Function that inserts a post (given a post object as a parameter) */
-    var insertPost = function(post) {
+    var insertPost = function(post, userVotes) {
+
+        var upArrow = "content__post__votes__arrow__inactive";
+        var downArrow = "content__post__votes__arrow__inactive";
+        if (userVotes > 0) {
+            var upArrow = "content__post__votes__arrow__active";
+        } else if (userVotes < 0) {
+            var downArrow = "content__post__votes__arrow__active";
+        }
         /* Create the post div and wrap it in a jquery object */
         var $post = $(
-            "<div class='content__post'>"+
+            "<div class='content__post' id='" + post.getID() + "'>"+
                 "<div class='content__post__votes'>"+
-                        "<img class='content__post__votes__arrow content__post__votes__arrow__inactive up' src='./images/vote.png'>"+
-                        "<p class='content__post__votes__count'>" + (post.getUpvotes() - post.getDownvotes()) + "</p>"+
-                        "<img class='content__post__votes__arrow content__post__votes__arrow__inactive down' src='./images/vote.png'>"+
+                        "<img class='content__post__votes__arrow " + upArrow + " up' src='./images/vote.png'>"+
+                        "<p class='content__post__votes__count'>" + (post.getVoteCount()) + "</p>"+
+                        "<img class='content__post__votes__arrow " + downArrow + " down' src='./images/vote.png'>"+
                 "</div>"+
                 "<div class='content__post__image'>"+
                     "<img class='content__post__image__icon' src='" + post.getImage() + "'>"+
@@ -80,19 +133,111 @@ $(document).ready(function() {
                     "<div class='content__post__textContent__title'>"+
                         "<p>" + post.getTitle() + "</p>"+
                     "</div>"+
+                    "<div class='content__post__textContent__content'>"+
+                        "<p>" + post.getContent() + "</p>"+
+                    "</div>"+
                     "<div class='content__post__textContent__details'>"+
-                        "<p>submitted " + post.getTimeSinceSubmitted() + " ago by <a>" + post.getUser() + "</a> to <a>" + post.getCategory() + "</a></p>"+
+                        "<p>submitted " + post.getTimeSinceSubmitted() + " ago by <a>" + post.getUser() + "</a> to <a class='content__post__textContent__details__category'>" + post.getCategory() + "</a></p>"+
                     "</div>"+
                     "<div class='content__post__textContent__options'>"+
-                        "<a class='option'>" + post.getNumberOfComments() + " comments</a><a class='option'>save</a><a class='option'>report</a><a class='option'>share</a>"+
+                        "<a class='option option__comments'>" + post.getComments().length + " comments</a><a class='option'>save</a><a class='option'>report</a><a class='option'>share</a>"+
                     "</div>"+
+                "</div>"+
+                "<div class='content__post__commentForm'>"+
+                    "<textarea class='content__post__commentForm__content content__post__commentForm__input' placeholder='Leave a comment...'></textarea>"+
+                    "<input class='content__post__commentForm__commentButton' type='button' value='Comment'>"+
+                "</div>"+
+                "<div class='content__post__comments'>"+
                 "</div>"+
             "</div>"
         );
+        // $post.prop("associatedPostObject", post);
+        posts[post.getID()] = {"element": $post, "object": post};
+
+        /* Post comment */
+        $post.find(".content__post__commentForm__commentButton").click(function(e) {
+            e.preventDefault();
+
+            /* If there is no content */
+            if ($activePostObject.find(".content__post__commentForm__input").val().length < 1) {
+                var normalColor = $activePostObject.find(".content__post__commentForm").css("background-color");
+                $activePostObject.find(".content__post__commentForm").css("background-color", "#a0442b");
+                $activePostObject.find(".content__post__commentForm").animate({backgroundColor: normalColor}, 1000);
+                $activePostObject.find(".content__post__commentForm__input").focus();
+                console.log("No comment provided...");
+                return;
+            }
+
+            /* Verify that the user is logged in */
+            var username = " ";
+            var uid = 0;
+            $.ajax('./php/authenticate.php',
+                {type: 'POST',
+                cache: false,
+                success: function (data) {
+                    /* User already logged in */
+                    username = data["username"];
+                    uid = data["uid"];
+                },
+                error: function () {
+                    /* User not logged in */
+                }
+            });
+            if (username == "") {
+                var normalColor = $activePostObject.find(".content__post__commentForm").css("background-color");
+                $activePostObject.find(".content__post__commentForm").css("background-color", "#a0442b");
+                $activePostObject.find(".content__post__commentForm").animate({backgroundColor: normalColor}, 1000);
+                console.log("Not logged in...");
+                return;
+            }
+
+            var pid = parseInt($activePostObject.attr("id"));
+            var content = $activePostObject.find(".content__post__commentForm__input").val();
+
+            /* Store the comment in our database */
+            $.ajax('./php/process-submit-comment.php',
+                {type: 'POST',
+                data: {pid: pid, content: content, time: Date.now(), username: username},
+                cache: false,
+                success: function (data) {
+                    /* Insert the comment into the user's DOM */
+                    var commentObject = new Comment(data["cid"], pid, content, Date.now(), username, uid);
+                    insertComment(commentObject, posts[pid]["element"], pid);
+                    $activePostObject.find(".content__post__commentForm__input").val("");
+                    // $activePostObject["associatedPostObject"].getComments().push(commentObject);
+
+                    // var normalColor = "#0b4779";
+                    // $(".loginBlock").css("background-color", "#548436");
+                    // $(".loginBlock").animate({backgroundColor: normalColor}, 1000);
+                },
+                error: function (data) {
+                    var normalColor = $activePostObject.find(".content__post__commentForm").css("background-color");
+                    $activePostObject.find(".content__post__commentForm").css("background-color", "#a0442b");
+                    $activePostObject.find(".content__post__commentForm").animate({backgroundColor: normalColor}, 1000);
+                }
+            });
+        });
 
         /* Enable upvote and downvote arrows for the post */
         $post.find(".content__post__votes__arrow").click(function() {
+
+            
+            /* Verify that the user is logged in */
+            $.ajax('./php/authenticate.php',
+                {type: 'POST',
+                cache: false,
+                success: function (data) {
+                    /* User already logged in */
+                    
+                },
+                error: function () {
+                    
+                }
+            });
+
             /* Vote */
+            var change = 0;
+            var currentVote = 0;
             if ($(this).hasClass("content__post__votes__arrow__inactive")) {
                 var alreadyVoted = $(this).siblings(".content__post__votes__arrow__active").length > 0;
                 $(this).siblings(".content__post__votes__arrow").removeClass("content__post__votes__arrow__active");
@@ -100,12 +245,15 @@ $(document).ready(function() {
                 $(this).removeClass("content__post__votes__arrow__inactive");
                 $(this).addClass("content__post__votes__arrow__active");
     
-                var change = alreadyVoted ? 2 : 1;
+                change = alreadyVoted ? 2 : 1;
     
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) + change);
+                    currentVote = 1;
                 } else {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - change);
+                    change = change * -1;
+                    currentVote = -1;
                 }
                 
             } 
@@ -116,14 +264,71 @@ $(document).ready(function() {
     
                 if ($(this).hasClass("up")) {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) - 1);
+                    change = -1;
                 } else {
                     $(this).siblings("p").html(parseInt($(this).siblings("p").html()) + 1);
+                    change = 1;
                 }
+
+                currentVote = 0;
             }
+
+            var pid = $post.attr("id");
+
+            /* Store the post object's data in our database */
+            $.ajax('./php/process-vote.php',
+                {type: 'POST',
+                data: {pid: pid, change: change, currentVote: currentVote},
+                cache: false,
+                success: function () {
+
+                },
+                error: function (data) {
+                    alert("Your vote won't count if you aren't logged in!");
+                }
+            });
+
+            
         });
 
-        /* Append the post to the content pane (before the prev/next navigators) */
-        $($post).insertBefore($(".prev"));
+        /* Function for displaying a post */
+        var activatePost = function() {
+            if (postActive && $activePostObject == $post) {
+                $post.animate({height: "90px"}, 200, function() {
+                    $post.find(".content__post__textContent__content").css("display", "none");
+                    $post.find(".content__post__commentForm").css("display", "none");
+                    $post.find(".content__post__comments").css("display", "none");
+                    $(".content__post").each(function() {
+                        $(this).css("display", "block");
+                        $(this).css("overflow-y", "hidden");
+                    });
+                });
+                postActive = false;
+                $activePostObject = null;
+            } else {
+                $(".content__post").each(function() {
+                    $(this).css("height", "90px");
+                    $(this).css("display", "none");
+                    $(this).css("overflow-y", "hidden");
+                });
+                $post.css("display", "block");
+                $post.animate({height: "90%"}, 200, function() {
+                    $post.css("overflow-y", "auto");
+                });
+                $post.find(".content__post__textContent__content").css("display", "block");
+                $post.find(".content__post__commentForm").css("display", "block");
+                $post.find(".content__post__comments").css("display", "block");
+                postActive = true;
+                $activePostObject = $post;
+            }
+        };
+
+        /* Click listener for displaying the post content and comments */
+        $post.find(".content__post__textContent__title").click(activatePost);
+        $post.find(".option__comments").click(activatePost);
+
+        /* Append the post to the top of the content pane */
+        $($post).insertAfter($(".content__header"));
     }
 
     /* This function clears up what content is being displayed */
@@ -136,16 +341,16 @@ $(document).ready(function() {
         "My SAVED posts in ";
         var categorySuffix = $(".siteNavigationBar__pageLink__active").text().toUpperCase();
         if (categorySuffix == "ALL") {
-        if (sortPrefix == "MY posts to ") {
-        sortPrefix = "ALL of MY posts";
-        categorySuffix = "";
-        } else if (sortPrefix == "MY comments in ") {
-        sortPrefix = "ALL of MY comments";
-        categorySuffix = "";
-        } else if (sortPrefix == "My SAVED posts in ") {
-        sortPrefix = "ALL of my SAVED posts";
-        categorySuffix = "";
-        }
+            if (sortPrefix == "MY posts to ") {
+                sortPrefix = "ALL of MY posts";
+                categorySuffix = "";
+            } else if (sortPrefix == "MY comments in ") {
+                sortPrefix = "ALL of MY comments";
+                categorySuffix = "";
+            } else if (sortPrefix == "My SAVED posts in ") {
+                sortPrefix = "ALL of my SAVED posts";
+                categorySuffix = "";
+            }
         }
         $(".content__header").html(sortPrefix + categorySuffix);
     };
@@ -172,6 +377,10 @@ $(document).ready(function() {
 
         /* If there is no title */
         if ($(".infoPane__submitForm__title").val().length < 1) {
+            var normalColor = $(".infoPane__submitForm").css("background-color");
+            $(".infoPane__submitForm").css("background-color", "#a0442b");
+            $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
+            $(".infoPane__submitForm__title").focus();
             return;
         }
 
@@ -180,7 +389,7 @@ $(document).ready(function() {
         var content = $(".infoPane__submitForm__content").val();
 
         /* Verify that the user is logged in */
-        var username = "";
+        var username = " ";
         $.ajax('./php/authenticate.php',
             {type: 'POST',
             cache: false,
@@ -193,45 +402,36 @@ $(document).ready(function() {
             }
         });
         if (username == "") {
+            var normalColor = $(".infoPane__submitForm").css("background-color");
+            $(".infoPane__submitForm").css("background-color", "#a0442b");
+            $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
             return;
         }
 
         var category = $(".infoPane__submitForm__select").val();
 
-        /* Insert the post into the user's DOM */
-        var postObject = new Post(0, 0, thumbnailLink, title, content, Date.now(), username, category, 0);
-        insertPost(postObject);
-
         /* Store the post object's data in our database */
+        $.ajax('./php/process-submit-post.php',
+            {type: 'POST',
+            data: {title: title, category: category, content: content, thumbnailLink: thumbnailLink, time: Date.now()},
+            cache: false,
+            success: function () {
+                /* Insert the post into the user's DOM */
+                var postObject = new Post(/* TODO: ID */0, 0, thumbnailLink, title, content, Date.now(), username, category, []);
+                insertPost(postObject, 0);
 
-        // I added in this chunk to mess around with- may or may not work
-        ////////////////////////////////////////////////////////////////////////
-        var url_base="https://wwwp.cs.unc.edu/Courses/comp426-f17/users/vnm/RamZone/php";
-        /*  $.ajax(url_base + "/postScript.php",
-          {type: "GET",
-          dataType: "json",
-          success: function(todo_json, status, jqXHR) {
-	           alert("SUCCESS!");
+                location.reload();
+
+                // var normalColor = "#0b4779";
+                // $(".loginBlock").css("background-color", "#548436");
+                // $(".loginBlock").animate({backgroundColor: normalColor}, 1000);
+            },
+            error: function (data) {
+                var normalColor = $(".infoPane__submitForm").css("background-color");
+                $(".infoPane__submitForm").css("background-color", "#a0442b");
+                $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
             }
-          });
-          */
-          //create a json object to send
-          var send = {"type": "newPost","thumbnailLink": thumbnailLink, "title": title,"content": content,"user": username,"category": category};
-          $.ajax(url_base + "/postScript.php",
-				    {type: "POST",
-                        dataType: "json",
-                        data: send,
-                        success: function(todo_json, status, jqXHR) {
-                        // alert("SUCCESS");
-					    },
-					    error: function(jqXHR, status, error) {
-                        // alert("BAD");
-					    // alert(jqXHR.responseText);
-                        }
-                    });
-
-
-        ///////////////////////////////////////////////////////////////////////
+        });
     });
 
 
@@ -241,13 +441,35 @@ $(document).ready(function() {
 
     /* DESKTOP */
     var prepareForDesktop = function() {
-        
+
         /* Click listener for categories */
         $(".siteNavigationBar__pageLink").click(function () {
+            /* Hide any active posts */
+            $(".content__post").each(function() {
+                $(this).css("display", "block");
+                $(this).css("height", "90px");
+                $(this).css("overflow-y", "hidden");
+                $(this).find(".content__post__textContent__content").css("display", "none");
+                $(this).find(".content__post__commentForm").css("display", "none");
+                $(this).find(".content__post__comments").css("display", "none");
+            });
+            postActive = false;
+            $activePostObject = null;
+
             $(".siteNavigationBar__pageLink").removeClass("siteNavigationBar__pageLink__active");
             $(".siteNavigationBar__pageLink").addClass("siteNavigationBar__pageLink__inactive");
             $(this).removeClass("siteNavigationBar__pageLink__inactive");
             $(this).addClass("siteNavigationBar__pageLink__active");
+
+            var selectedCategory = $(".siteNavigationBar__pageLink__active").text().trim();
+            $(".content__post").each(function () {
+                if ($(this).find(".content__post__textContent__details__category").text().trim() == selectedCategory ||
+                    selectedCategory == "All") {
+                    $(this).css("display", "block");
+                } else {
+                    $(this).css("display", "none");
+                }
+            });
 
             updateContentSortHeader();
         });
@@ -268,6 +490,8 @@ $(document).ready(function() {
                     duration: 600
                 });
                 $(".utilityPanel__optionBlock__option__icon__collapsed").animate({opacity: "0"}, 200);
+                $(".content__post").animate({width: "62%"}, 200);
+                $(".next").css("padding-right", "42%");
                 utilityPanelCollapsed = false;
             } else {
                 $(this).animate({left: "-=215px"}, 200);
@@ -283,6 +507,8 @@ $(document).ready(function() {
                     duration: 600
                 });
                 $(".utilityPanel__optionBlock__option__icon__collapsed").animate({opacity: "1"}, 200);
+                $(".content__post").animate({width: "80%"}, 200);
+                $(".next").css("padding-right", "25%");
                 utilityPanelCollapsed = true;
             }
         });
@@ -411,12 +637,18 @@ $(document).ready(function() {
             reg = /^\w+$/; 
             if(!reg.test($(".utilityPanel__optionBlock__newUsername").val())) { 
                 $(".utilityPanel__optionBlock__newUsername").focus();
+                var normalColor = "#0b4779";
+                $(".createAccountBlock").css("background-color", "#a0442b");
+                $(".createAccountBlock").animate({backgroundColor: normalColor}, 1000);
                 return false;
             }
 
             /* Check to make sure passwords match */
             if ($('.utilityPanel__optionBlock__newPassword').val() != $('.utilityPanel__optionBlock__confirmNewPassword').val()) {
                 $('.utilityPanel__optionBlock__confirmNewPassword').focus();
+                var normalColor = "#0b4779";
+                $(".createAccountBlock").css("background-color", "#a0442b");
+                $(".createAccountBlock").animate({backgroundColor: normalColor}, 1000);
                 return false;
             }
 
@@ -451,149 +683,60 @@ $(document).ready(function() {
                 }
             });
         });
+
+
+        var retrieveComments = function() {
+            /* Retrieve Comments */
+            $.ajax('./php/retrieve-comments.php',
+                {type: 'POST',
+                data: {},
+                cache: false,
+                success: function (data) {
+                    data.forEach(function(comment, index) {
+                        var retrievedComment = new Comment(comment[0*2], comment[1*2], comment[2*2], comment[3*2], comment[4*2], comment[5*2]);
+                        /* id, pid, content, time, username, uid */
+                        var $postObject = posts[comment[1*2]]["element"];
+                        insertComment(retrievedComment, $postObject, comment[1*2]);
+                    });
+                    posts.forEach(function(post) {
+                        var text = post["object"].getComments().length == 1 ? "1 comment" : post["object"].getComments().length + " comments";
+                        post["element"].find(".option__comments").html(text);
+                    });
+                },
+                error: function () {
+                    var normalColor = $(".content").css("background-color");
+                    $(".content").css("background-color", "#a0442b");
+                    $(".content").animate({backgroundColor: normalColor}, 1500);
+                }
+            });
+        };
+
+
+        /* Retrieve Posts */
+        $.ajax('./php/retrieve-posts.php',
+            {type: 'POST',
+            data: {category: "General", sort: "New", page: "1"},
+            cache: false,
+            success: function (data) {
+                data.forEach(function(post, index) {
+                    var retrievedPost = new Post(/* ID */ post[0*2], post[8*2], post[6*2], post[1*2], post[5*2], post[7*2], "user"+post[2*2], post[4*2], /* Comments */[]);
+                    insertPost(retrievedPost, post[8*2 + 1]/* user votes */);
+                    if (index == data.length - 1) {
+                        retrieveComments();
+                    }
+                });
+            },
+            error: function () {
+                var normalColor = $(".content").css("background-color");
+                $(".content").css("background-color", "#a0442b");
+                $(".content").animate({backgroundColor: normalColor}, 1500);
+                console.log("Error retrieving posts...");
+            }
+        });
+
+        
     };
 
-    /* MOBILE ( NOT HIGHLY IMPORTANT RIGHT NOW!! ) */
-    var prepareForMobile = function() {
-        $(".siteNavigationBar__search").css("display", "none");
-        $(".siteNavigationBar__searchButton").css("display", "none");
-
-        $(".siteNavigationBar").css("height", "12%");
-        $(".siteNavigationBar").css("left", "16%");
-        $(".siteNavigationBar__pageLink").css("width", "84%");
-        $(".siteNavigationBar__pageLink h1").css("font-size", "250%");
-        $(".siteNavigationBar__pageLink__inactive").css("display", "none");
-        $(".siteNavigationBar__pageLink__active").css("border", "none");
-
-        $(".utilityPanel__collapser").css("left", "-84%");
-        $(".utilityPanel__collapser").css("width", "100%");
-        $(".utilityPanel__collapser").css("height", "12%");
-        $(".utilityPanel__collapser__arrow").css("height", "80%");
-        $(".utilityPanel__collapser__arrow").css("width", "auto");
-        $(".utilityPanel__collapser__arrow").css("padding", "none");
-        $(".utilityPanel").css("left", "-84%");
-        $(".utilityPanel").css("width", "100%");
-        $(".utilityPanel").css("top", "12%");
-        $(".utilityPanel__optionBlock").css("width", "100%");
-        $(".utilityPanel__optionBlock__option").css("width", "100%");
-        $(".icon").css("height", "200%");
-        $(".icon").css("width", "auto");
-        $(".utilityPanel__optionBlock__option__icon__collapsed").css("padding-right", "9%");
-        $(".utilityPanel__optionBlock__option").css("font-size", "200%");
-        $(".utilityPanel__optionBlock__header").css("font-size", "200%");
-        $(".utilityPanel__collapser__text").css("font-size", "200%");
-        $(".utilityPanel__optionBlock__option").css("height", "auto");
-        $(".utilityPanel__optionBlock").css("height", "auto");
-
-        $(".utilityPanel__optionBlock").css("border-bottom", "0px solid #487697");
-        $(".utilityPanel__collapser__arrow").rotate({
-            angle: 0,
-            animateTo: 180,
-            duration: 10
-        });
-        $(".utilityPanel__optionBlock__option__icon__collapsed").animate({opacity: "1"}, 10);
-        utilityPanelCollapsed = true;
-
-        $(".content").css("left", "16%");
-        $(".content").css("width", "84%");
-        $(".content").css("height", "88%");
-        $(".content__post").css("width", "90%");
-        $(".content").css("top", "12%");
-        $(".content__post__textContent__details").css("display", "none");
-        $(".content__post__textContent__options").css("display", "none");
-        $(".content__post__textContent__title").css("font-size", "200%");
-
-        $(".next").css("float", "right");
-        $(".next").css("padding-right", "6%");
-        $(".content__navigator").css("font-size", "250%");
-
-
-        $(".utilityPanel__collapser").click(function() {
-            if (utilityPanelCollapsed) {
-                $(this).animate({left: "0%"}, 200);
-                $(".utilityPanel").animate({left: "0%"}, 200);
-                $(".siteNavigationBar").animate({left: "100%"}, 200);
-                $(".content").animate({left: "+=215px"}, 200);
-                $(".utilityPanel__optionBlock").css("border-bottom", "1px solid #487697");
-                $(".utilityPanel__collapser__arrow").rotate({
-                    angle: 180,
-                    animateTo: 0,
-                    duration: 600
-                });
-                $(".utilityPanel__optionBlock__option__icon__collapsed").animate({opacity: "0"}, 200);
-                utilityPanelCollapsed = false;
-            } else {
-                $(this).animate({left: "-84%"}, 200);
-                $(".utilityPanel").animate({left: "-84%"}, 200);
-                $(".siteNavigationBar").animate({left: "16%"}, 200);
-                $(".content").animate({left: "-=215px"}, 200);
-                $(".utilityPanel__optionBlock").css("border-bottom", "0px solid #487697");
-                $(".utilityPanel__collapser__arrow").rotate({
-                    angle: 0,
-                    animateTo: 180,
-                    duration: 600
-                });
-                $(".utilityPanel__optionBlock__option__icon__collapsed").animate({opacity: "1"}, 200);
-                utilityPanelCollapsed = true;
-            }
-        });
-
-        $(".utilityPanel__optionBlock__option").click(function() {
-            $(".utilityPanel__optionBlock__option").removeClass("utilityPanel__optionBlock__option__active");
-            $(".utilityPanel__optionBlock__option").addClass("utilityPanel__optionBlock__option__inactive");
-            $(this).removeClass("utilityPanel__optionBlock__option__inactive");
-            $(this).addClass("utilityPanel__optionBlock__option__active");
-
-            var img = $(this).find(".icon");
-            if (img.hasClass("hot")) {
-                img.attr("src", "./images/hot-active.png");
-            } else {
-                $(".hot").attr("src", "./images/hot.png");
-            }
-            if (img.hasClass("new")) {
-                img.attr("src", "./images/new-active.png");
-            } else {
-                $(".new").attr("src", "./images/new.png");
-            }
-            if (img.hasClass("posts")) {
-                img.attr("src", "./images/posts-active.png");
-            } else {
-                $(".posts").attr("src", "./images/posts.png");
-            }
-            if (img.hasClass("comments")) {
-                img.attr("src", "./images/comments-active.png");
-            } else {
-                $(".comments").attr("src", "./images/comments.png");
-            }
-            if (img.hasClass("saved")) {
-                img.attr("src", "./images/saved-active.png");
-            } else {
-                $(".saved").attr("src", "./images/saved.png");
-            }
-        });
-
-        $(".siteNavigationBar__pageLink").click(function () {
-            if (navigationOpenedOnMobile) {
-                $(".siteNavigationBar__pageLink").removeClass("siteNavigationBar__pageLink__active");
-                $(".siteNavigationBar__pageLink").addClass("siteNavigationBar__pageLink__inactive");
-                $(this).removeClass("siteNavigationBar__pageLink__inactive");
-                $(this).addClass("siteNavigationBar__pageLink__active");
-                navigationOpenedOnMobile = false;
-                $(".siteNavigationBar__pageLink__inactive").css("display", "none");
-                $(".siteNavigationBar__pageLink__active").css("border", "none");
-            } else {
-                $(".siteNavigationBar__pageLink__inactive").css("display", "inline-block");
-                navigationOpenedOnMobile = true;
-            }
-            
-        });
-    };
-
-    /* SELECT WHETHER TO PREPARE THE DOM FOR MOBILE OR DESKTOP */
-    if ($(document).height() > $(document).width() * 1.2) {
-        prepareForDesktop(); // prepareForMobile();
-    } else {
-        prepareForDesktop();
-    }
+    prepareForDesktop();
 
 });
