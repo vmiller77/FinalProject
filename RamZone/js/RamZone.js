@@ -277,7 +277,7 @@ var retrievePosts = function(){
                         "<p>submitted " + post.getTimeSinceSubmitted() + " ago by <a>" + post.getUser() + "</a> to <a class='content__post__textContent__details__category'>" + post.getCategory() + "</a></p>"+
                     "</div>"+
                     "<div class='content__post__textContent__options'>"+
-                        "<a class='option option__comments'>" + post.getComments().length + " comments</a><a class='option'>save</a><a class='option'>report</a><a class='option'>share</a>"+
+                        "<a class='option option__comments'>" + post.getComments().length + " comments</a><a id='save' class='option'>save</a><a class='option'>report</a><a class='option'>share</a>"+
                     "</div>"+
                 "</div>"+
                 "<div class='content__post__commentForm'>"+
