@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+div.content__post[search=false]{
+	display: none;
+}
+
 body {
 	/* Size */
 	width: 100%;

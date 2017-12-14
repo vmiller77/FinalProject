@@ -1,23 +1,139 @@
 $(document).ready(function() {
+//Putting this function up here so it can be access globally
+var retrieveComments = function() {
+            /* Retrieve Comments */
+            $.ajax('./php/retrieve-comments.php',
+                {type: 'POST',
+                data: {},
+                cache: false,
+                success: function (data) {
+                    data.forEach(function(comment, index) {
+                      console.log(comment);
+                        var retrievedComment = new Comment(comment[0*2], comment[1*2], comment[2*2], comment[3*2], comment[4*2], comment[5*2]);
+                        /* id, pid, content, time, username, uid */
+                        var $postObject = posts[comment[1*2]]["element"];
+                        insertComment(retrievedComment, $postObject, comment[1*2]);
+                    });
+                    posts.forEach(function(post) {
+                        var text = post["object"].getComments().length == 1 ? "1 comment" : post["object"].getComments().length + " comments";
+                        post["element"].find(".option__comments").html(text);
+                    });
+                },
+                error: function () {
+                    var normalColor = $(".content").css("background-color");
+                    $(".content").css("background-color", "#a0442b");
+                    $(".content").animate({backgroundColor: normalColor}, 1500);
+                }
+            });
+        };
+var retrievePosts = function(){
+  /* Retrieve Posts */
+  $.ajax('./php/retrieve-posts.php',
+      {type: 'POST',
+      data: {category: "General", sort: "New", page: "1"},
+      cache: false,
+      success: function (data) {
+          data.forEach(function(post, index) {
+              var retrievedPost = new Post(/* ID */ post[0*2], post[8*2], post[6*2], post[1*2], post[5*2], post[7*2],
+              //  "user"+post[2*2]
+              post[9*2]
+                , post[4*2], /* Comments */[]);
+              insertPost(retrievedPost, post[8*2 + 1]/* user votes */);
+              if (index == data.length - 1) {
+                  retrieveComments();
+              }
+          });
+      },
+      error: function () {
+          var normalColor = $(".content").css("background-color");
+          $(".content").css("background-color", "#a0442b");
+          $(".content").animate({backgroundColor: normalColor}, 1500);
+          console.log("Error retrieving posts...");
+      }
+  });
+};
+
+
+  /*Hot Posts Clicked*/
+  $("#hot").click(function() {
+    /*Take off all posts*/
+    $(".content__post").remove();
+
+    /* Retrieve Posts */
+    $.ajax('./php/retrieve-posts.php',
+        {type: 'POST',
+        data: {category: "General", sort: "hot", page: "1"},
+        cache: false,
+        success: function (data) {
+            data.forEach(function(post, index) {
+              console.log(post);
+                var retrievedPost = new Post(/* ID */ post[0*2], post[8*2], post[6*2], post[1*2], post[5*2], post[7*2],
+                //  "user"+post[2*2]
+                post[9*2]
+                  , post[4*2], /* Comments */[]);
+                insertPost(retrievedPost, post[8*2 + 1]/* user votes */);
+                if (index == data.length - 1) {
+                    retrieveComments();
+                }
+            });
+        },
+        error: function () {
+            var normalColor = $(".content").css("background-color");
+            $(".content").css("background-color", "#a0442b");
+            $(".content").animate({backgroundColor: normalColor}, 1500);
+            console.log("Error retrieving posts...");
+        }
+    });
+  });
+
+  /*New Posts Clicked*/
+  $("#new").click(function() {
+    /*Take off all posts*/
+    $(".content__post").remove();
+
+    /* Retrieve Posts */
+      retrievePosts();
+  });
+
 
     /*Search Bar Function*/
     var search=function(searchString){
       var searchWords=searchString.split(' ');
       //all posts
-      post=$(".content__post")
-
+      post=$(".content__post");
       //goes through each post
-      for(var i = 0; i < post.length;i++){
-        post_i=post[i];
-        children=post_i.children;
-        //goes through each word in search Bar
-        for(var i = 0; i < searchWords.length;i++){
-          if(children[0].innerText.includes(searchWords)||children[1].innerText.includes(searchWords)){
 
+     for(var i = 0; i < post.length;i++){
+        post_i=post[i];
+        children=post_i.children[2];
+        children=children.children;
+        //goes through each word in search Bar
+        for(var j = 0; j < searchWords.length;j++){
+          if(children[0].innerText.toLowerCase().includes(searchWords[j])
+          ||children[1].innerText.toLowerCase().includes(searchWords[j])
+          ||children[2].innerText.toLowerCase().includes(searchWords[j])){
+            //Make this post visible
+            post_i.setAttribute("search","true");
+            console.log("true");
           }
         }
       }
+
     };
+
+    /* Click listener*/
+    $(".siteNavigationBar__searchButton").click(function() {
+      //make all search attribute set to false
+      post=$(".content__post");
+      for(var i = 0; i < post.length;i++){
+        post[i].setAttribute("search","false");
+      }
+      console.log("SEARCH");
+      search($(".siteNavigationBar__search").val());
+      $(".siteNavigationBar__search").val("");
+    });
+
+
 
 
 
@@ -121,7 +237,7 @@ $(document).ready(function() {
         var $comment = $(
             "<div class='content__post__comments__comment'>"+
                 "<p class='content__post__comments__comment__text'>" + comment.getContent() + "</p>"+
-                "<p class='content__post__comments__comment__user'>user" + comment.getUID() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
+                "<p class='content__post__comments__comment__user'>" + comment.getUser() + " replied " + comment.getTimeSinceSubmitted() + " ago</p>"+
             "</div>"
         );
         // $comment.prop("associatedCommentObject", comment);
@@ -202,6 +318,7 @@ $(document).ready(function() {
                 },
                 error: function () {
                     /* User not logged in */
+                    alert(" You cannot comment unless you login!");
                 }
             });
             if (username == "") {
@@ -410,49 +527,57 @@ $(document).ready(function() {
         var content = $(".infoPane__submitForm__content").val();
 
         /* Verify that the user is logged in */
-        var username = " ";
+        var username = "";
         $.ajax('./php/authenticate.php',
             {type: 'POST',
             cache: false,
             success: function (data) {
                 /* User already logged in */
                 username = data["username"];
+                var category = $(".infoPane__submitForm__select").val();
+
+                /* Store the post object's data in our database */
+                $.ajax('./php/process-submit-post.php',
+                    {type: 'POST',
+                    data: {title: title, category: category, content: content, thumbnailLink: thumbnailLink, time: Date.now()},
+                    cache: false,
+                    success: function () {
+                        /* Insert the post into the user's DOM */
+                        var postObject = new Post(/* TODO: ID */0, 0, thumbnailLink, title, content, Date.now(), username, category, []);
+                        insertPost(postObject, 0);
+
+                        //location.reload();
+
+                        // var normalColor = "#0b4779";
+                        // $(".loginBlock").css("background-color", "#548436");
+                        // $(".loginBlock").animate({backgroundColor: normalColor}, 1000);
+                    },
+                    error: function (data) {
+                        var normalColor = $(".infoPane__submitForm").css("background-color");
+                        $(".infoPane__submitForm").css("background-color", "#a0442b");
+                        $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
+                    }
+                });
+
+                /*Take off all posts*/
+                $(".content__post").remove();
+                /* Retrieve Posts */
+                retrievePosts();
             },
             error: function () {
+                alert("You are not logged in!");
                 /* User not logged in */
+                    var normalColor = $(".infoPane__submitForm").css("background-color");
+                    $(".infoPane__submitForm").css("background-color", "#a0442b");
+                    $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
+                    return;
             }
         });
-        if (username == "") {
-            var normalColor = $(".infoPane__submitForm").css("background-color");
-            $(".infoPane__submitForm").css("background-color", "#a0442b");
-            $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
-            return;
-        }
 
-        var category = $(".infoPane__submitForm__select").val();
-
-        /* Store the post object's data in our database */
-        $.ajax('./php/process-submit-post.php',
-            {type: 'POST',
-            data: {title: title, category: category, content: content, thumbnailLink: thumbnailLink, time: Date.now()},
-            cache: false,
-            success: function () {
-                /* Insert the post into the user's DOM */
-                var postObject = new Post(/* TODO: ID */0, 0, thumbnailLink, title, content, Date.now(), username, category, []);
-                insertPost(postObject, 0);
-
-                location.reload();
-
-                // var normalColor = "#0b4779";
-                // $(".loginBlock").css("background-color", "#548436");
-                // $(".loginBlock").animate({backgroundColor: normalColor}, 1000);
-            },
-            error: function (data) {
-                var normalColor = $(".infoPane__submitForm").css("background-color");
-                $(".infoPane__submitForm").css("background-color", "#a0442b");
-                $(".infoPane__submitForm").animate({backgroundColor: normalColor}, 1000);
-            }
-        });
+        /*Clear the fields*/
+        $(".infoPane__submitForm__title").val("");
+        $(".infoPane__submitForm__content").val("");
+        $(".infoPane__submitForm__thumnailLink").val("");
     });
 
 
@@ -572,10 +697,12 @@ $(document).ready(function() {
         });
 
         /* If the user is already logged in */
+        var username="";
         $.ajax('./php/authenticate.php',
             {type: 'POST',
             cache: false,
             success: function (data) {
+              username=data["username"];
                 /* User already logged in, so display account and logout blocks */
                 $(".accountBlock").css("display", "block");
                 $(".logoutBlock").css("display", "block");
@@ -733,27 +860,39 @@ $(document).ready(function() {
         };
 
 
-        /* Retrieve Posts */
-        $.ajax('./php/retrieve-posts.php',
-            {type: 'POST',
-            data: {category: "General", sort: "New", page: "1"},
-            cache: false,
-            success: function (data) {
-                data.forEach(function(post, index) {
-                    var retrievedPost = new Post(/* ID */ post[0*2], post[8*2], post[6*2], post[1*2], post[5*2], post[7*2], "user"+post[2*2], post[4*2], /* Comments */[]);
-                    insertPost(retrievedPost, post[8*2 + 1]/* user votes */);
-                    if (index == data.length - 1) {
-                        retrieveComments();
-                    }
-                });
-            },
-            error: function () {
-                var normalColor = $(".content").css("background-color");
-                $(".content").css("background-color", "#a0442b");
-                $(".content").animate({backgroundColor: normalColor}, 1500);
-                console.log("Error retrieving posts...");
-            }
-        });
+    retrievePosts();
+
+    /* My posts Clicked*/
+    $("#myPosts").click(function() {
+      /*Take off all posts*/
+      $(".content__post").remove();
+
+      /* Retrieve Posts */
+      $.ajax('./php/retrieve-posts.php',
+          {type: 'POST',
+          data: {category: "General", sort: "myPosts", user: username, page: "1"},
+          cache: false,
+          success: function (data) {
+              data.forEach(function(post, index) {
+                  var retrievedPost = new Post(/* ID */ post[0*2], post[8*2], post[6*2], post[1*2], post[5*2], post[7*2],
+                  //  "user"+post[2*2]
+                  post[9*2]
+                    , post[4*2], /* Comments */[]);
+                  insertPost(retrievedPost, post[8*2 + 1]/* user votes */);
+                  if (index == data.length - 1) {
+                      retrieveComments();
+                  }
+              });
+          },
+          error: function () {
+              var normalColor = $(".content").css("background-color");
+              $(".content").css("background-color", "#a0442b");
+              $(".content").animate({backgroundColor: normalColor}, 1500);
+              console.log("Error retrieving posts...");
+          }
+      });
+    });
+
 
 
     };

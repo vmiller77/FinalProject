@@ -3,7 +3,7 @@
 include_once("connect-to-db.php");
 
 function login($username, $password, $mysqli) {
-    // Using prepared statements means that SQL injection is not possible. 
+    // Using prepared statements means that SQL injection is not possible.
     if ($query = $mysqli->prepare("SELECT U.id, U.username, U.email, U.password, U.salt FROM Users U WHERE U.username = ? LIMIT 1")) {
         $query->bind_param("s", $username);
         $query->execute();
@@ -16,8 +16,8 @@ function login($username, $password, $mysqli) {
         // hash the password with the unique salt.
         $password = hash('sha512', $password . $salt);
         if ($query->num_rows == 1) {
-            
-            // Check if the password in the database matches 
+
+            // Check if the password in the database matches
             // the password the user submitted.
             if ($db_password == $password) {
                 // Password is correct!
@@ -32,20 +32,19 @@ function login($username, $password, $mysqli) {
 
                 $auth = hash('sha512', $password . $user_browser);
 
-                setcookie('auth', $auth, 0, '/Courses/comp426-f17/users/jamhenry/final/RamZone/', '.wwwp.cs.unc.edu', true);
-
-                // $_SESSION['auth'] = hash('sha512', $password . $user_browser);
-                // Login successful. 
+                setcookie('auth', $auth, time()+3600, '/', 'wwwp.cs.unc.edu', true);
+                 //$_SESSION['auth'] = hash('sha512', $password . $user_browser);
+                // Login successful.
                 return true;
             } else {
-                // Password is not correct 
-                header('HTTP/1.1 401 Unauthorized');
+                // Password is not correct
+                header('HTTP/1.1 401 Unauthorized-Another one');
                 header('Content-type: application/json');
                 print(json_encode(false));
             }
-            
+
         } else {
-            // No user exists. 
+            // No user exists.
             header('HTTP/1.1 401 Unauthorized');
             header('Content-type: application/json');
             print(json_encode(false));
@@ -64,7 +63,7 @@ session_start();
 if (isset($_POST["username"], $_POST["password"])) {
     $username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
     $password = $_POST["password"]; // The hashed password.
-    
+
     if (login($username, $password, $mysqli) == true) {
         header('Content-type: application/json');
         $json_obj = array('username' => $username);
@@ -72,7 +71,7 @@ if (isset($_POST["username"], $_POST["password"])) {
     } else {
         unset($_SESSION['user_id']);
         unset($_SESSION['username']);
-      
+
         header('HTTP/1.1 401 Unauthorized');
         header('Content-type: application/json');
         print(json_encode(false));
